@@ -51,7 +51,63 @@
        fstype: "{{ item.filesystemtype }}"
        uuid: "{{ item.uuid }}"
      loop: "{{ alzheimersfilesystem }}"
-  
+     register: create_results
+     failed_when: "'contains a mounted' not in create_results.stderr"
+
+   - name: captures filesystem uuid for dns2.nextgenlabs.com
+     ansible.builtin.shell: lsblk /dev/mapper/vg.alzheimers-lv.alzheimers -no uuid
+     register: lsblk1_result
+     when: ansible_hostname == "dns2"
+
+   - name: print server dns2 uuid
+     ansible.builtin.debug:
+      var: lsblk1_result.stdout
+
+   - name: capture filesystem uuid for database2.nextgenlabs.com
+     ansible.builtin.shell: lsblk /dev/mapper/vg.alzheimers-lv.alzheimers -no uuid
+     register: lsblk2_result
+     when: ansible_hostname == "database2"
+
+   - name: print server database2 uuid
+     ansible.builtin.debug:
+      var: lsblk2_result.stdout
+
+
+   - name: task create mount point
+     ansible.builtin.file: 
+      path: /mnt/alzheimers
+      state: directory
+      recurse: true
+      owner: root
+      group: root
+      mode: '0664'
+
+   - name: task creates a persistent mount for alzheimers fs on dns2 server
+     ansible.posix.mount:
+      path: /mnt/alzheimers
+      src: UUID={{ lsblk1_result.stdout }}
+      fstype: xfs
+      dump: 1
+      passno: 2
+      state: mounted
+     when: ansible_hostname == "dns2"
+
+   - name: task creates a persistent mount for alzheimers fs on database2 server
+     ansible.posix.mount:
+      src: UUID={{ lsblk2_result.stdout }}
+      path: /mnt/alzheimers
+      fstype: xfs
+      dump: 1
+      passno: 2
+      state: mounted
+     when: ansible_hostname == "database2"
+
+   - name: task does a daemon reload
+     ansible.builtin.shell: systemctl daemon-reload
+     
+
+
+
   when: ansible_facts['devices']['sdb'] is defined
 
 
