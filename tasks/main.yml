@@ -44,7 +44,6 @@
        shrink: false
      loop: "{{ logicalvolumes }}"
      ignore_errors: true
-     when: ansible_facts['lvm']['vgs']['vg.alzheimers']  
  
    - name: task creates a xfs filesystem 
      community.general.filesystem:
