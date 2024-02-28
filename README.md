@@ -25,7 +25,8 @@ This role creates and mounts a file system.<br>
 
     ---
     - name: play does logical volume management
-      hosts: servers
+      hosts: all
+      become: true
       roles:
          - lvm_role
 
