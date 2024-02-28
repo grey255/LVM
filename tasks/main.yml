@@ -1,5 +1,12 @@
 ---
 # tasks file for roles/lvm_role
+- name: task installs  packages
+  ansible.builtin.yum:
+   name: "{{ item.package }}"
+   state: "{{ item.state }}"
+  loop: "{{ packages }}"
+  when: ansible_facts['devices']['sdb'] is defined
+
 - name: task capture block devices info from servers when /dev/sdb exits
   ansible.builtin.shell: lsblk
   register: lsblk0_result

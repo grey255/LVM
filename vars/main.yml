@@ -1,5 +1,9 @@
 ---
 # vars file for roles/lvm_role
+packages:
+ - package: lvm2
+   state: present
+
 partitions: 
  - partition0: /dev/sdb
    state: present
