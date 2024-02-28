@@ -1,60 +1,58 @@
 ---
 # tasks file for roles/lvm_role
-- name: task installs  packages
-  ansible.builtin.yum:
-   name: "{{ item.package }}"
-   state: "{{ item.state }}"
-  loop: "{{ packages }}"
+
+- name: tasks configure and mount filesystem for an alzheimer's clinical trial
+  block:
+   - name: task installs  packages
+     ansible.builtin.yum:
+       name: "{{ item.package }}"
+       state: "{{ item.state }}"
+     loop: "{{ packages }}"
+
+   - name: task capture block devices info from servers when /dev/sdb exits
+     ansible.builtin.shell: lsblk
+     register: lsblk0_result
+
+   - name: task displays block devices
+     ansible.builtin.debug:
+       var: lsblk0_result
+
+   - name: reload partitions to kernel
+     ansible.builtin.shell: partprobe /dev/sdb
+
+   - name: task creates partition {{ partition0 }} 
+     community.general.parted:
+      device: "{{ item.partition0 }}"
+      number: "{{ item.number }}"
+      flags: "{{ item.flags }}"
+      state: "{{ item.state }}"
+      part_end: "{{ item.part_end }}"
+     loop: "{{ partitions }}"
+
+   - name: task creates volume group 
+     community.general.lvg:
+       vg: "{{ item.vg_name }}"
+       pvs: "{{ item.pvs }}"
+       pesize: "{{ item.pesize }}"
+     loop: "{{ volumegroups }}"
+
+   - name: task creates a logical volume of size 50% of volume group
+     community.general.lvol:
+       vg: "{{ item.vg_name }}"
+       lv: "{{ item.lv_name }}"
+       size: "{{ item.size }}"
+       shrink: false
+     loop: "{{ logicalvolumes }}"
+     ignore_errors: true
+     when: ansible_facts['lvm']['vgs']['vg.alzheimers']  
+ 
+   - name: task creates a xfs filesystem 
+     community.general.filesystem:
+       dev: /dev/{{ item.vg_name }}/{{ item.lv_name }}
+       fstype: "{{ item.filesystemtype }}"
+       uuid: "{{ item.uuid }}"
+     loop: "{{ alzheimersfilesystem }}"
+  
   when: ansible_facts['devices']['sdb'] is defined
-
-- name: task capture block devices info from servers when /dev/sdb exits
-  ansible.builtin.shell: lsblk
-  register: lsblk0_result
-  when: ansible_facts['devices']['sdb'] is defined
-
-- name: task displays block devices
-  ansible.builtin.debug:
-   var: lsblk0_result
-  when: ansible_facts['devices']['sdb'] is defined 
-
-- name: reload partitions to kernel
-  ansible.builtin.shell: partprobe /dev/sdb
-  when: ansible_facts['devices']['sdb'] is defined
-
-- name: task creates partition {{ partition0 }} 
-  community.general.parted:
-   device: "{{ item.partition0 }}"
-   number: "{{ item.number }}"
-   flags: "{{ item.flags }}"
-   state: "{{ item.state }}"
-   part_end: "{{ item.part_end }}"
-  loop: "{{ partitions }}"
-  when: ansible_facts['devices']['sdb'] is defined
-
-- name: task creates volume group 
-  community.general.lvg:
-   vg: "{{ item.vg_name }}"
-   pvs: "{{ item.pvs }}"
-   pesize: "{{ item.pesize }}"
-  loop: "{{ volumegroups }}"
-  when: ansible_facts['devices']['sdb'] is defined
-
-- name: task creates a logical volume of size 50% of volume group
-  community.general.lvol:
-   vg: "{{ item.vg_name }}"
-   lv: "{{ item.lv_name }}"
-   size: "{{ item.size }}"
-  loop: "{{ logicalvolumes }}"
-  ignore_errors: true
-  when: (ansible_facts['devices']['sdb'] is defined and ansible_facts['lvm']['vgs']['vg.alzheimers'] is undefined) 
-
-- name: task creates a xfs filesystem 
-  community.general.filesystem:
-   dev: /dev/{{ item.vg_name }}/{{ item.lv_name }}
-   fstype: "{{ item.filesystemtype }}"
-   uuid: "{{ item.uuid }}"
-  loop: "{{ alzheimersfilesystem }}"
-  when: ansible_facts['devices']['sdb'] is defined
-
 
 
