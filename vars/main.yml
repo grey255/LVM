@@ -1,2 +1,25 @@
 ---
 # vars file for roles/lvm_role
+partitions: 
+ - partition0: /dev/sdb
+   state: present
+   number: 1
+   part_end: 1GiB
+   flags: [ lvm ]
+
+volumegroups:
+ - vg_name: vg.alzheimers
+   pvs: /dev/sdb1
+   pesize: 32
+
+logicalvolumes:
+ - lv_name: lv.alzheimers
+   vg_name: vg.alzheimers
+   size: 50%FREE
+
+alzheimersfilesystem:
+ - filesystemtype: xfs
+   uuid: generate
+   vg_name: vg.alzheimers
+   lv_name: lv.alzheimers
+
