@@ -27,3 +27,18 @@ alzheimersfilesystem:
    vg_name: vg.alzheimers
    lv_name: lv.alzheimers
 
+
+mysql_packages:
+ - MySQL 8.0 Community Server
+ 
+
+
+
+
+
+
+
+
+
+
+
