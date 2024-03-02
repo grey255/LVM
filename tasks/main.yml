@@ -105,28 +105,6 @@
    - name: task does a daemon reload
      ansible.builtin.shell: systemctl daemon-reload
      
-
-   - name: task creates mysql database on nodes
-     ansible.builtin.yum_repository:
-       name: MySQL 8.0 Community Server
-       description: MySQL
-       baseurl: https://repo.mysql.com/yum/mysql-8.0-community/el/9/x86_64/
-       file: MySQL
-       enabled: 1
-       gpgcheck: 1
-       gpgkey:
-        - file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2023
-        - file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2022
-
-   - name: task cleans yum headers, cache and metadata
-     ansible.builtin.shell: yum clean all
-
-   - name: task installs MySQL 8.0 Community Server
-     ansible.builtin.yum:
-      name: mysql-community-server-8.0.36-1.el9.x86_64.rpm
-      state: present
-
-
    
   when: ansible_facts['devices']['sdb'] is defined
 

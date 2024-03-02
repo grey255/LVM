@@ -1,0 +1,8 @@
+---
+- name: configure lvm 
+  hosts: database2.nextgenlabs.com,dns2.nextgenlabs.com
+  become: yes
+  ignore_errors: true
+  roles:
+   - lvm_role
+   - bertvv.mariadb
