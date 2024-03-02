@@ -18,8 +18,8 @@ This role creates and mounts a file system.<br>
 # Dependencies
 ------------
  * Mounting done using UUID<br>
+ * Install community.mysql
  
-
 # Example Playbook
 ----------------
 
@@ -28,6 +28,7 @@ This role creates and mounts a file system.<br>
       hosts: servers
       roles:
          - lvm_role
+         - bertvv.mariadb
 
 License
 -------
